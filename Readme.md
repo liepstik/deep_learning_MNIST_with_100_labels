@@ -13,6 +13,6 @@
   - GANs : SGAN, DC-GAN, cGAN
   - Autoencoder
   - Algorithme supervisé pour la baseline (SVM, KNN ?)
-* Performance Baseline : résultat
+* Performance Baseline : résultat de l'algorithme supervisé choisi
 * Etude comparative des différentes méthodes : interprétation et visualisation des résultats sur l'entrainement et le test (évolution de l'accuracy en fonction des epochs)
 * Références 
