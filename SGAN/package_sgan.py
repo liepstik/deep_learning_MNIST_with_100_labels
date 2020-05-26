@@ -44,20 +44,20 @@ class Dataset:
         self.x_test = preprocess_imgs(self.x_test)
         self.y_test = preprocess_labels(self.y_test)
 
-    # Obtenez un random batch des images étiquetées et leurs étiquettes
+    # Obtenez un random batch d'images étiquetées et leurs étiquettes
     def batch_labeled(self, batch_size):
         idx = np.random.randint(0, self.num_labeled, batch_size)
         imgs = self.x_train[idx]
         labels = self.y_train[idx]
         return imgs, labels
     
-    # Obtenez un random batch des images sans étiquetées
+    # Obtenez un random batch d'images sans étiquetées
     def batch_unlabeled(self, batch_size):
 
         idx = np.random.randint(self.num_labeled, self.x_train.shape[0], batch_size)
         imgs = self.x_train[idx]
         return imgs
-    # Fonction pour retourner les données training (seulement 100 labels)
+    # Fonction pour renvoyer les données training (seulement 100 labels)
     def training_set(self):
         x_train = self.x_train[range(self.num_labeled)]
         y_train = self.y_train[range(self.num_labeled)]
@@ -74,7 +74,7 @@ class SGAN:
         self.channels = 1
         self.img_shape = (self.rows, self.cols, self.channels)
         self.num_classes = 10 
-        self.z_dim = 100     
+        self.z_dim = 100     # la taille du vecteur de bruit z 
         self.n_epochs=n_epochs 
         self.batch_size = batch_size
         self.generator = self.build_generator()
@@ -86,7 +86,7 @@ class SGAN:
         model.add(Dense(256 * 7 * 7, input_dim=self.z_dim))
         model.add(Reshape((7, 7, 256)))
     
-        # Couche transposed convolution : de 7x7x256 vers14x14x128 
+        # Couche Transposed convolution : de 7x7x256 vers14x14x128 
         model.add(Conv2DTranspose(128, kernel_size=3, strides=2, padding='same'))
     
         # Batch normalization
@@ -95,19 +95,19 @@ class SGAN:
         # ReLU
         model.add(LeakyReLU(alpha=0.01))
         
-        # Couche transposed convolution : de 14x14x128 vers 14x14x64 
+        # Couche Transposed convolution : de 14x14x128 vers 14x14x64 
         model.add(Conv2DTranspose(64, kernel_size=3, strides=1, padding='same'))
     
         # Batch normalization
         model.add(BatchNormalization())
         # ReLU
         model.add(LeakyReLU(alpha=0.01))
-        # Couche transposed convolution : de 14x14x64 vers 28x28x1 
+        # Couche Transposed convolution : de 14x14x64 vers 28x28x1 
         model.add(Conv2DTranspose(1, kernel_size=3, strides=2, padding='same'))
     
         # Tanh activation
         model.add(Activation('tanh'))
-        model.summary()
+        #model.summary()
         # Le generator prend le bruit en entrée et génere des images
         z = Input(shape=(self.z_dim,))
         img = model(z)
@@ -208,6 +208,29 @@ class SGAN:
 
         half_batch = int(self.batch_size / 2)
         print('n_epochs=%d, n_batch=%d, 1/2=%d' % (self.n_epochs, self.batch_size, half_batch))
+        # une fonction pour l'affichage des images
+        def sample_images(n_epoch):
+            r, c = 5, 5
+            noise = np.random.normal(0, 1, (r * c, self.z_dim))
+            gen_imgs = generator.predict(noise)
+
+            # Rescale images 0 - 1
+            gen_imgs = 0.5 * gen_imgs + 1
+
+            fig, axs = plt.subplots(r, c)
+            cnt = 0
+            for i in range(r):
+                for j in range(c):
+                    axs[i,j].imshow(gen_imgs[cnt, :,:,0], cmap='gray')
+                    axs[i,j].axis('off')
+                    cnt += 1
+            fig.show()
+            fig.savefig("images/%d.png" % n_epoch)
+            plt.close()
+        def save_model(step):
+            f1= 'models/dcgan_discriminator_weight_%04d.h5' % (step+1)
+            discriminator_supervised.save(f1)
+            #print("save model")
     
         for iteration in range(self.n_epochs):
             
@@ -254,25 +277,8 @@ class SGAN:
                 # on le sauvgarde pour la visualisation
                 d_losses.append(d_loss_supervised)
                 iteration_checkpoints.append(iteration + 1)
-        discriminator_supervised.save("discriminator_supervised.h5")
-        return discriminator_supervised,iteration_checkpoints, d_losses,d_accuracies
+                sample_images(iteration)
+                save_model(iteration)
+        return iteration_checkpoints, d_losses,d_accuracies
  
-    # une fonction pour l'affichage des images
-    def sample_images(self, n_epoch):
-        r, c = 5, 5
-        noise = np.random.normal(0, 1, (r * c, self.z_dim))
-        gen_imgs = self.generator.predict(noise)
-
-        # Rescale images 0 - 1
-        gen_imgs = 0.5 * gen_imgs + 1
-
-        fig, axs = plt.subplots(r, c)
-        cnt = 0
-        for i in range(r):
-            for j in range(c):
-                axs[i,j].imshow(gen_imgs[cnt, :,:,0], cmap='gray')
-                axs[i,j].axis('off')
-                cnt += 1
-        fig.show()
-        fig.savefig("images/sgan/%d.png" % n_epoch)
-        plt.close()
+    
