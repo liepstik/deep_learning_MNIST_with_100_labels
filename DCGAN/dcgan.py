@@ -143,8 +143,6 @@ class DCGAN:
             d_loss, accuracy = 0.5 * np.add(d_loss_real, d_loss_fake)
 
 
-            z = np.random.normal(0, 1, (batch_size, 100))
-            gen_imgs = generator.predict(z)
 
             g_loss = gan.train_on_batch(z, real)
 
