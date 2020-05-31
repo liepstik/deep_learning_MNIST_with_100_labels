@@ -1,5 +1,5 @@
 # Prédiction des données MNIST avec uniquement 100 labels
-
+## MLSD-APPRENTISSAGE 2019/2020
 ## Team :
 - Bouchra ABIDAR
 - Laura LIEPCHITZ
