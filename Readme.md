@@ -7,8 +7,9 @@
 ## Environnement technique : 
 Python, Keras
 
-## Plan provisoire :
+## Plan du rapport:
 * Introduction : 
+  - Importance du deep learning dans la reconnaissance d'image
   - L'utilité d'apprendre à entrainer des modéles sur des données réduites
   - Présentation des parties de rapports
 * Etat de l'art et desciption des méthodes utilisées (références aux articles donnés dans le sujet)
