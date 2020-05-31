@@ -4,6 +4,9 @@
 - Bouchra ABIDAR
 - Laura LIEPCHITZ
 
+## Environnement technique : 
+Python, Keras
+
 ## Plan provisoire :
 * Introduction : 
   - L'utilité d'apprendre à entrainer des modéles sur des données réduites
